@@ -1,5 +1,94 @@
 # Structural-Programming
 
+## Function
+
+### 原则
+
+- 定义不允许嵌套
+- 先定义后使用
+
+### 函数的执行机制
+
+- 建立被调用函数的栈空间 
+
+- 参数传递
+
+  - 值传递 (call by value)
+
+  - 引用传递 (call by reference)
+
+- 保存调用函数的运行状态
+
+- 将控制转交被调函数
+
+### 函数重载
+
+- 原则
+  - 函数名相同，参数不同(类型，个数，顺序)
+  - 返回值不作为区分的标准
+- 匹配原则
+  - 严格匹配(参数)
+  - 内部转换(参数)(隐式)
+  - 用户自定义的转换
+
+sample:
+
+```cpp
+void f(int x){
+    cout << "int" << endl;
+}
+void f(long x){
+    cout << "long" << endl;
+}
+void g(double x){
+    cout <<"double" << endl;
+}
+void g(string s){
+    cout << "string" << endl;
+}
+void h(char c){
+    cout << "char" << endl;
+}
+void h(double x){
+    cout << "double" << endl;
+}
+int main(){
+    f(1);//int, 这是严格匹配
+    g(1);//double, 这是内部转换
+    f(1L);//long, 这是用户定义的转换
+    h(1);//error, ambiguous call
+    return 0;
+}
+```
+
+### 默认参数
+
+- 语法 : 默认参数放在非默认参数后面(why ? 非默认参数需要值，要先匹配完)
+- 默认参数可能导致模糊的函数重载 
+
+```cpp
+void f(int);
+void f(int, int=2);
+//ambiguous
+```
+
+### 内联函数 inline
+
+- 目的 : 提高可读性，提高效率(函数调用需要开销)
+- 实现方法 : 编译系统将为 inline 函数创建一段代码，在调用点，以相应的代码替换
+- 限制 : 不能递归
+- 适用 : 使用频率高，简单，小段代码
+- 注意:
+  - 只是请求 inline，编译系统不一定会采纳
+- 缺点：
+  - 增大目标代码
+  - 病态的换页
+  - 降低 cache命中率
+
+## Program organization
+
+
+
 ## Array
 
 ### 特征
