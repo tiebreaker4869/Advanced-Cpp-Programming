@@ -87,7 +87,37 @@ void f(int, int=2);
 
 ## Program organization
 
+### 原则
 
+- 分成头文件(.h)按和源文件(.cpp)
+- 头文件中放: 常量定义，变量、函数声明，类型定义，编译预处理，内联函数
+
+### 使用 namespace
+
+两种使用方式
+
+declaration
+
+```cpp
+namespace L{
+    int k;
+    void f();
+}
+using namespace L::k;
+using namespace L::f;
+k = 0;
+f();
+```
+
+directive
+
+```cpp
+using namespace L;
+k = 0;
+f();
+```
+
+不建议多次使用 using-directive, 如果没用到很多尽量 using-declaration
 
 ## Array
 
