@@ -110,4 +110,226 @@ cout << (int*)s << endl;//地址值
   }
   ```
 
-  
+
+### 常量指针与指针常量
+
+- 常量指针: 指向常量的指针
+
+`const <type> * <pointer_variable>`
+
+```cpp
+//sample
+const int c = 0;
+int y = 0;
+const int * cp = &c;//ok
+int * p = &y;//ok
+cp = &y;//ok
+*cp = 1 //error
+*p = 1;//ok
+p = &c;//error without const_cast<int*>
+```
+
+使用常量指针可以消除函数副作用，当不准备产生副作用的时候尽可能使用。
+
+```cpp
+void f(const int* p);// p read only
+void g(int * p);//p read and write
+```
+
+a sample about const cast
+
+```cpp
+int x=10;
+int *p = &x;
+cout << " x  " << &x  << x << endl;
+cout << " p  " << &p << p << endl;
+cout << "*p " << p <<  *p << endl;
+
+
+const int c=128;
+int * q = const_cast<int *>(&c);
+*q = 111;
+cout << " c " << &c << c << endl; //c      0012FF74    128
+cout << " q " << &q << q << endl;// q      0012FF70    0012FF74
+cout << "*q " << q << *q << endl;//*q      0012FF74    111
+```
+
+为什么这里 c 的值打印出来仍然是 128 ? 
+
+因为用了 const int 会把代码里出现 c 的地方直接用常量 128 代替，即使在实际上那块空间的值已经变化。
+
+以下我写了一小段代码来验证：
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+int main(){
+        const int c = 128;
+        int a = 10;
+        int b = a + c;
+        return 0;
+}
+```
+
+这时反汇编中main函数的部分
+
+```assembly
+0000000000001169 <main>:
+    1169:       f3 0f 1e fa             endbr64
+    116d:       55                      push   %rbp
+    116e:       48 89 e5                mov    %rsp,%rbp
+    1171:       c7 45 f4 80 00 00 00    movl   $0x80,-0xc(%rbp)
+    1178:       c7 45 f8 0a 00 00 00    movl   $0xa,-0x8(%rbp)
+    117f:       8b 45 f8                mov    -0x8(%rbp),%eax
+    1182:       83 e8 80                sub    $0xffffff80,%eax
+    1185:       89 45 fc                mov    %eax,-0x4(%rbp)
+    1188:       b8 00 00 00 00          mov    $0x0,%eax
+    118d:       5d                      pop    %rbp
+    118e:       c3                      retq
+```
+
+看 1182 这一行, 在上一行中把变量 a 中的值存到了 eax 里面, 然后在这行直接与常量进行计算, 减去 0xffffff80 就是加上 0x80, 也就是常量 c 的值，这里不是先把 c 的值拷贝过来，而是直接用常量参与运算，说明其实这里的 c 被替换成了常量 128
+
+- 指针常量 ： 这个指针本身是个常量
+
+必须在定义的时候初始化，之后不能指向别的对象
+
+`<type> * const <variable> = &x;`
+
+```cpp
+int x = 0;
+int y = 1;
+int * const p = &x;//ok
+p = &y;//error
+*p = 1;//ok
+```
+
+### 指针作为形参
+
+- 提高传输效率： 比传入整个对象一般消耗的空间和时间资源少
+- 函数副作用 ： 需要产生副作用的时候传入非常量指针
+- 常量指针 ： 防止副作用
+
+### 函数指针
+
+语法 : `<return type> (*<variable_name>)(parameter list)`
+
+sample :
+
+```cpp
+//...
+double f(int x);
+int main(){
+    double (*pf)(int) = f;
+    double y = f(1);
+    return 0;
+}
+```
+
+### 指针与数组
+
+- 数组元素操作: 下标表达式， random access `O(1)`
+
+- 数组元素的指针表示法
+
+sample
+
+```cpp
+int a[10];
+a[1] = 1;// 和 *(a + 1) = 1 等价，数组参与表达式退化成指针
+int b[10][10];
+//b[i][j] <-> *(*(b + i) + j)
+```
+
+不管几维的数组，在内存中都是连续分布的，据此可以进行数组的升维降维操作。
+
+- 指针数组 : 元素是指针的数组
+
+### 指针与结构
+
+- 函数传参传递结构体的时候经常传递指向结构体的指针，减少大块传输，提高效率
+- 如果有可能尽量使用 const 指针
+
+## Dynamic Variable
+
+### 动态变量
+
+- 动态在哪？
+  - 大小
+  - 生命周期
+- 非编译时刻确定
+- 生存在堆 (heap) 上
+
+### 申请
+
+语法:
+
+`new <typename>`
+
+`new <typename>[integer expression]`
+
+和 malloc 的区别，malloc 不会调用构造函数
+
+### 归还
+
+语法:
+
+`delete <pointer variable>`
+
+`delete[]  <pointer variable>`
+
+和 free 的区别: free 不会调用析构函数
+
+### 应用
+
+- 数据结构 : 链表，树，图...
+
+## Reference
+
+### 引用
+
+- 为已有的一块内存空间取一个别名
+
+sample:
+
+```cpp
+int x = 0;
+int &r = x;
+r = 1;
+cout << x << endl;//1
+```
+
+- 引用变量必须指向同类型变量
+- 引用变量必须初始化
+
+### 应用
+
+- 函数参数传递
+- 动态变量命名
+
+```cpp
+void f(int& x){
+    x = 2;
+}
+int main(){
+    int y = 1;
+    f(y);
+    cout << y << endl;//2
+    return 0;
+}
+```
+
+### 使用注意事项
+
+- 传参数的时候有可能的话尽量用 const 限定引用(不需要副作用的话)
+- 引用一旦定义无法改变
+- 如何释放引用堆上的对象
+
+```cpp
+int *p = new int(100);
+int &x = *p;
+delete &x;
+```
+
