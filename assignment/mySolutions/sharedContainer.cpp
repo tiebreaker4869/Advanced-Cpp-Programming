@@ -9,7 +9,6 @@ public:
 
     ~Content() {
         std::cout << "destroy " << std::to_string(id) << std::endl;
-        delete[] data;
     }
     
     void add_ref_count(){
@@ -62,14 +61,13 @@ public:
         if(other_data == _data)return *this;
         if(_data == nullptr){
             _data = other_data;
-            _data->add_ref_count();
         }else {
             _data->decrease_ref_count();
             int count = _data->get_ref_count();
             if(count == 0)Content::free_content(_data);
             _data = other_data;
         }
-
+        _data->add_ref_count();
         return *this;
     }
     //TODO
