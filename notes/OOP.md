@@ -203,3 +203,78 @@ A::f();
 
 ## 友元
 
+- 类外部不能访问 private 成员
+- 需要通过 public 方法来访问
+- 但是有时候需要频繁这么做，多次调用函数会降低效率
+
+### 分类
+
+- 友元类
+
+  - 如果一个类 B 把 类 A 声明为 friend class，那么类 A 就可以访问 B 的私有和保护成员
+
+  - ```cpp
+    //demo
+    class B {
+      private:
+        int private_int;
+       friend class A;
+    };
+    
+    class A {
+        public:
+        	void f(B b);
+    };
+    
+    void A::f(B b){
+        cout << b.private_int << endl;//ok
+    };
+    ```
+
+    
+
+- 友元成员函数：如果 一个类 B 把 A 的一个成员函数 f 声明为友元函数，那么只有这个函数里面能访问 B 的私有成员
+
+```cpp
+class B {
+  private:
+	int private_int;
+   friend void A::f(B b);
+};
+
+class A {
+    public:
+    	void f(B b){
+            cout << b.private_int << endl;//ok
+        }
+    	void g(B b){
+            cout << b.private_int << endl;//error
+        }
+};
+```
+
+- 友元函数: 如果类 B 把一个函数声明为友元函数，那么这个函数可以访问类 B 的私有和保护成员
+
+### 作用
+
+- 提高灵活性
+- 数据保护和数据存取的一个折中方案
+
+## 继承
+
+- 基于目标代码的复用
+- 把事物分类
+- 增量开发
+
+### 单继承
+
+- 语法：
+
+```cpp
+class A : public B {
+    
+};
+//A public 继承 B
+//继承方式还有 private 和 protected
+```
+
