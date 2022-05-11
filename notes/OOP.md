@@ -138,3 +138,68 @@ string::string (String &&s):p(s.p)
 {s.p=nullptr; }
 ```
 
+## 动态对象
+
+- 在 heap 创建的
+- 用 new 创建，delete 释放
+- new 会调用构造函数，delete 会调用析构函数
+
+## const 成员变量
+
+- 最好在成员初始化表进行初始化（但是直接在定义的地方初始化好像并不会报错）
+
+## const 成员函数
+
+- const 成员函数里面不能改变成员变量
+- 机制是传入的 this 指针是 `const A* const this`
+
+```cpp
+//Demo
+class A {
+    public:
+    	int x;
+    	int y;
+    	void f() const;
+};
+//violation
+void A::f(){
+    x = 1;//error
+    cout << x << endl;//ok
+}
+```
+
+## 静态成员变量
+
+- 语法
+
+```cpp
+//demo
+class A {
+    public:
+    	static int shared;
+};
+
+int A::shared = 1;
+```
+
+## 静态成员函数
+
+- 语法
+
+```cpp
+class A {
+    public:
+    	static int shared;
+    	static void f();
+}
+
+//调用
+A::f();
+```
+
+- 通过类名调用
+- 静态成员函数里面只能访问静态成员，以及调用静态成员函数，因为普通成员函数和成员变量需要依赖某一个对象实例才能存在，而静态成员函数是整个类的实例共享的。
+- 遵守类的访问控制
+
+## 友元
+
