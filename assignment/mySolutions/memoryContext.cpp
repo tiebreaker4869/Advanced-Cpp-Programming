@@ -47,18 +47,21 @@ class MemoryContext {
 
 MemoryContext::MemoryContext(MemoryContext *parent) {
   // TODO: your code
+  //add to parent's children queue
   this->parent = parent;
   if(parent != nullptr)this->parent->children.push(this);
 }
 
 MemoryContext::~MemoryContext() {
   // TODO: your code
+  //recursively delete children
   while(!children.empty()){
     MemoryContext* child = children.front();
     children.pop();
     delete child;
   }
 
+  //delete itself
   while(!stk.empty()){
     Data* data = stk.top();
     stk.pop();
